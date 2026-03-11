@@ -131,6 +131,13 @@
       font-weight: 700;
     }
 
+    .correct-answer {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
     .ok { color: var(--ok); }
     .bad { color: var(--bad); }
     .hidden { display: none; }
@@ -310,6 +317,10 @@
           card.appendChild(input);
         }
 
+        const correctText = document.createElement("p");
+        correctText.className = "correct-answer hidden";
+        card.appendChild(correctText);
+
         questionList.appendChild(card);
       });
     }
@@ -348,6 +359,11 @@
           const valid = Array.isArray(correct) ? correct.map(normalize) : [normalize(correct)];
           isCorrect = valid.includes(userValue);
         }
+
+        const rightAnswers = Array.isArray(correct) ? correct : [correct];
+        const answerText = card.querySelector(".correct-answer");
+        answerText.textContent = `Правильный ответ: ${rightAnswers.join(" / ")}`;
+        answerText.classList.remove("hidden");
 
         card.style.borderColor = isCorrect ? "#2e9d69" : "#d35454";
         if (isCorrect) correctCount += 1;
