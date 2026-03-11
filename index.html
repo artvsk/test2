@@ -160,18 +160,12 @@
 <body>
   <div class="container">
     <h1>TerraRush Quiz 🚀</h1>
-    <p class="subtitle">Выбирай материк, отвечай на 10 вопросов и прокачивай географию.</p>
+    <p class="subtitle">Выбирай материк: в базе 20 вопросов, а в тест каждый раз попадают случайные 10.</p>
 
     <section id="home-screen" class="card">
       <div class="home">
         <label for="continent-select">Какой материк выбираем сегодня?</label>
         <select id="continent-select"></select>
-        <label for="difficulty-select">Уровень сложности</label>
-        <select id="difficulty-select">
-          <option value="Easy">Easy</option>
-          <option value="Medium">Medium</option>
-          <option value="Hard">Hard</option>
-        </select>
         <button id="start-btn">Поехали! Начать тест</button>
       </div>
     </section>
@@ -369,7 +363,6 @@
     });
 
     const continentSelect = document.getElementById("continent-select");
-    const difficultySelect = document.getElementById("difficulty-select");
     const startBtn = document.getElementById("start-btn");
     const backBtn = document.getElementById("back-btn");
     const checkBtn = document.getElementById("check-btn");
@@ -391,23 +384,20 @@
       });
     }
 
-    function getQuestionsByDifficulty(continent, difficulty) {
-      const all = questionBank[continent];
-      const chunkSize = Math.ceil(all.length / 3);
-      const groups = {
-        Easy: all.slice(0, chunkSize),
-        Medium: all.slice(chunkSize, chunkSize * 2),
-        Hard: all.slice(chunkSize * 2)
-      };
-      const chosen = (groups[difficulty] && groups[difficulty].length ? groups[difficulty] : all).slice(0, 10);
-      return chosen;
+    function getRandomQuestions(continent) {
+      const all = [...questionBank[continent]];
+      for (let i = all.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [all[i], all[j]] = [all[j], all[i]];
+      }
+      return all.slice(0, 10);
     }
 
-    function renderQuestions(continent, difficulty) {
-      currentQuestions = getQuestionsByDifficulty(continent, difficulty);
+    function renderQuestions(continent) {
+      currentQuestions = getRandomQuestions(continent);
       questionList.innerHTML = "";
       quizStatus.textContent = "";
-      quizTitle.textContent = `Материк: ${continent} • Сложность: ${difficulty} • Вопросов: ${currentQuestions.length}`;
+      quizTitle.textContent = `Материк: ${continent} • Случайные вопросы: ${currentQuestions.length}/20`;
 
       currentQuestions.forEach((q, index) => {
         const card = document.createElement("div");
@@ -457,8 +447,7 @@
 
     startBtn.addEventListener("click", () => {
       const continent = continentSelect.value;
-      const difficulty = difficultySelect.value;
-      renderQuestions(continent, difficulty);
+      renderQuestions(continent);
       homeScreen.classList.add("hidden");
       quizScreen.classList.remove("hidden");
     });
