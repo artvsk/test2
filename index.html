@@ -166,7 +166,13 @@
       <div class="home">
         <label for="continent-select">Какой материк выбираем сегодня?</label>
         <select id="continent-select"></select>
-        <button id="start-btn">Поехали! 10 вопросов</button>
+        <label for="difficulty-select">Уровень сложности</label>
+        <select id="difficulty-select">
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+        <button id="start-btn">Поехали! Начать тест</button>
       </div>
     </section>
 
@@ -270,6 +276,7 @@
     };
 
     const continentSelect = document.getElementById("continent-select");
+    const difficultySelect = document.getElementById("difficulty-select");
     const startBtn = document.getElementById("start-btn");
     const backBtn = document.getElementById("back-btn");
     const checkBtn = document.getElementById("check-btn");
@@ -291,11 +298,18 @@
       });
     }
 
-    function renderQuestions(continent) {
-      currentQuestions = questionBank[continent].slice(0, 10);
+    function getQuestionsByDifficulty(continent, difficulty) {
+      const all = questionBank[continent].slice(0, 10);
+      if (difficulty === "Easy") return all.slice(0, 6);
+      if (difficulty === "Medium") return all.slice(2, 8);
+      return all.slice(4, 10);
+    }
+
+    function renderQuestions(continent, difficulty) {
+      currentQuestions = getQuestionsByDifficulty(continent, difficulty);
       questionList.innerHTML = "";
       quizStatus.textContent = "";
-      quizTitle.textContent = `Материк: ${continent} — 10 вопросов`;
+      quizTitle.textContent = `Материк: ${continent} • Сложность: ${difficulty} • Вопросов: ${currentQuestions.length}`;
 
       currentQuestions.forEach((q, index) => {
         const card = document.createElement("div");
@@ -345,7 +359,8 @@
 
     startBtn.addEventListener("click", () => {
       const continent = continentSelect.value;
-      renderQuestions(continent);
+      const difficulty = difficultySelect.value;
+      renderQuestions(continent, difficulty);
       homeScreen.classList.add("hidden");
       quizScreen.classList.remove("hidden");
     });
