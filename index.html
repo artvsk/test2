@@ -2,11 +2,443 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Мой сайт</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ГеоКонтроль — тренажёр по географии</title>
+  <style>
+    :root {
+      --bg: #f4f9ff;
+      --card: #ffffff;
+      --text: #14324b;
+      --muted: #4f6d86;
+      --accent: #1d7fe2;
+      --accent-dark: #0b5fb0;
+      --ok: #138f5a;
+      --bad: #c0392b;
+      --border: #d8e7f5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #eaf4ff 0%, #f7fbff 45%, #eef6ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 36px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 2.4vw, 2.4rem);
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 8px 18px rgba(6, 54, 102, 0.08);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.2rem;
+    }
+
+    .map-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .map-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: #fbfdff;
+      display: grid;
+      gap: 6px;
+    }
+
+    .map-item label {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    select, button, input[type="text"] {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid #bcd4eb;
+      padding: 8px 10px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: var(--accent-dark); }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .ghost {
+      background: #ecf4fd;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .ghost:hover { background: #e3effb; }
+
+    .status {
+      margin-top: 10px;
+      font-weight: 600;
+      min-height: 1.3em;
+    }
+
+    .ok { color: var(--ok); }
+    .bad { color: var(--bad); }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .question {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fcfeff;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .question p {
+      margin: 0 0 10px;
+      font-weight: 600;
+    }
+
+    .answers {
+      display: grid;
+      gap: 8px;
+    }
+
+    .answer-option {
+      border: 1px solid #d1e3f4;
+      border-radius: 10px;
+      padding: 8px;
+      background: #fff;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .legend {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Привет!</h1>
-  <p>Это мой сайт на GitHub Pages.</p>
+  <div class="container">
+    <header>
+      <h1>ГеоКонтроль</h1>
+      <p class="subtitle">Интерактивные контрольные по географии: карта мира + тесты по темам.</p>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2>1) Карта и сопоставление объектов</h2>
+        <p class="legend">Выберите для каждого объекта правильный материк.</p>
+        <div id="map-list" class="map-list"></div>
+        <div class="btn-row">
+          <button id="check-map">Проверить сопоставление</button>
+          <button id="reset-map" class="ghost">Сбросить</button>
+        </div>
+        <div id="map-status" class="status"></div>
+      </section>
+
+      <section class="card">
+        <h2>2) Вопросы по географии</h2>
+        <div class="filters">
+          <label>Континент
+            <select id="continent-filter"></select>
+          </label>
+          <label>Тема
+            <select id="topic-filter"></select>
+          </label>
+        </div>
+        <div id="question-list"></div>
+        <div class="btn-row">
+          <button id="check-quiz">Проверить ответы</button>
+          <button id="new-quiz" class="ghost">Новые вопросы</button>
+        </div>
+        <div id="quiz-status" class="status"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const continents = ["Европа", "Азия", "Африка", "Северная Америка", "Южная Америка", "Австралия", "Антарктида"];
+
+    const mapItems = [
+      { object: "Амазонка", continent: "Южная Америка" },
+      { object: "Сахара", continent: "Африка" },
+      { object: "Гималаи", continent: "Азия" },
+      { object: "Альпы", continent: "Европа" },
+      { object: "Большой Барьерный риф", continent: "Австралия" },
+      { object: "Великие озёра", continent: "Северная Америка" }
+    ];
+
+    const questions = [
+      {
+        type: "single",
+        continent: "Азия",
+        topic: "Климат",
+        text: "Какой тип климата преобладает в Юго-Восточной Азии?",
+        options: ["Арктический", "Муссонный", "Средиземноморский"],
+        correct: "Муссонный"
+      },
+      {
+        type: "single",
+        continent: "Африка",
+        topic: "Ископаемые ресурсы",
+        text: "Какая страна Африки известна крупной добычей алмазов?",
+        options: ["Ботсвана", "Непал", "Исландия"],
+        correct: "Ботсвана"
+      },
+      {
+        type: "text",
+        continent: "Европа",
+        topic: "Плотность населения",
+        text: "Назовите одну европейскую страну с высокой плотностью населения.",
+        correct: ["нидерланды", "бельгия", "мальта", "великобритания"]
+      },
+      {
+        type: "single",
+        continent: "Южная Америка",
+        topic: "Высотность",
+        text: "Какая горная система самая длинная в мире?",
+        options: ["Анды", "Кордильеры", "Урал"],
+        correct: "Анды"
+      },
+      {
+        type: "text",
+        continent: "Северная Америка",
+        topic: "Климат",
+        text: "Как называется климатический пояс на крайнем севере Канады?",
+        correct: ["арктический", "субарктический"]
+      },
+      {
+        type: "single",
+        continent: "Австралия",
+        topic: "Природные зоны",
+        text: "Какая природная зона занимает значительную часть центра Австралии?",
+        options: ["Тундра", "Пустыни и полупустыни", "Тайга"],
+        correct: "Пустыни и полупустыни"
+      }
+    ];
+
+    const mapList = document.getElementById("map-list");
+    const mapStatus = document.getElementById("map-status");
+    const continentFilter = document.getElementById("continent-filter");
+    const topicFilter = document.getElementById("topic-filter");
+    const questionList = document.getElementById("question-list");
+    const quizStatus = document.getElementById("quiz-status");
+
+    const topics = [...new Set(questions.map(q => q.topic))];
+
+    function createFilterOptions(selectEl, values) {
+      selectEl.innerHTML = "";
+      ["Все", ...values].forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        selectEl.appendChild(option);
+      });
+    }
+
+    function renderMapItems() {
+      mapList.innerHTML = "";
+      mapItems.forEach((item, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "map-item";
+
+        const label = document.createElement("label");
+        label.textContent = `${index + 1}. ${item.object}`;
+        label.setAttribute("for", `map-${index}`);
+
+        const select = document.createElement("select");
+        select.id = `map-${index}`;
+        select.dataset.correct = item.continent;
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Выберите континент";
+        select.appendChild(placeholder);
+
+        continents.forEach(continent => {
+          const option = document.createElement("option");
+          option.value = continent;
+          option.textContent = continent;
+          select.appendChild(option);
+        });
+
+        wrapper.append(label, select);
+        mapList.appendChild(wrapper);
+      });
+    }
+
+    function pickQuestions() {
+      const continent = continentFilter.value;
+      const topic = topicFilter.value;
+
+      const filtered = questions.filter(q =>
+        (continent === "Все" || q.continent === continent) &&
+        (topic === "Все" || q.topic === topic)
+      );
+
+      const selected = filtered.slice(0, 4);
+      questionList.innerHTML = "";
+      quizStatus.textContent = "";
+
+      if (!selected.length) {
+        questionList.innerHTML = "<p>Нет вопросов по выбранным фильтрам. Попробуйте другие значения.</p>";
+        return;
+      }
+
+      selected.forEach((q, index) => {
+        const box = document.createElement("div");
+        box.className = "question";
+        box.dataset.type = q.type;
+        box.dataset.correct = JSON.stringify(q.correct);
+
+        const title = document.createElement("p");
+        title.textContent = `${index + 1}. [${q.continent} • ${q.topic}] ${q.text}`;
+        box.appendChild(title);
+
+        if (q.type === "single") {
+          const answers = document.createElement("div");
+          answers.className = "answers";
+          q.options.forEach((optionText, i) => {
+            const label = document.createElement("label");
+            label.className = "answer-option";
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = `q-${index}`;
+            radio.value = optionText;
+            if (i === 0) radio.required = true;
+            label.append(radio, document.createTextNode(optionText));
+            answers.appendChild(label);
+          });
+          box.appendChild(answers);
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.placeholder = "Введите ответ";
+          input.dataset.role = "text-answer";
+          box.appendChild(input);
+        }
+
+        questionList.appendChild(box);
+      });
+    }
+
+    document.getElementById("check-map").addEventListener("click", () => {
+      const selects = mapList.querySelectorAll("select");
+      let correct = 0;
+
+      selects.forEach(select => {
+        if (select.value && select.value === select.dataset.correct) {
+          correct += 1;
+          select.style.borderColor = "#2e9d69";
+        } else {
+          select.style.borderColor = "#d35454";
+        }
+      });
+
+      const total = selects.length;
+      mapStatus.className = `status ${correct === total ? "ok" : "bad"}`;
+      mapStatus.textContent = `Результат: ${correct}/${total}`;
+    });
+
+    document.getElementById("reset-map").addEventListener("click", () => {
+      mapList.querySelectorAll("select").forEach(select => {
+        select.value = "";
+        select.style.borderColor = "#bcd4eb";
+      });
+      mapStatus.textContent = "";
+      mapStatus.className = "status";
+    });
+
+    document.getElementById("check-quiz").addEventListener("click", () => {
+      const cards = questionList.querySelectorAll(".question");
+      if (!cards.length) return;
+
+      let correctCount = 0;
+
+      cards.forEach(card => {
+        const type = card.dataset.type;
+        const correct = JSON.parse(card.dataset.correct);
+        let isCorrect = false;
+
+        if (type === "single") {
+          const picked = card.querySelector("input[type='radio']:checked");
+          isCorrect = Boolean(picked && picked.value === correct);
+        } else {
+          const user = card.querySelector("input[data-role='text-answer']").value.trim().toLowerCase();
+          isCorrect = Array.isArray(correct) ? correct.includes(user) : user === correct;
+        }
+
+        card.style.borderColor = isCorrect ? "#2e9d69" : "#d35454";
+        if (isCorrect) correctCount += 1;
+      });
+
+      quizStatus.className = `status ${correctCount === cards.length ? "ok" : "bad"}`;
+      quizStatus.textContent = `Верно: ${correctCount}/${cards.length}`;
+    });
+
+    document.getElementById("new-quiz").addEventListener("click", pickQuestions);
+    continentFilter.addEventListener("change", pickQuestions);
+    topicFilter.addEventListener("change", pickQuestions);
+
+    createFilterOptions(continentFilter, [...new Set(questions.map(q => q.continent))]);
+    createFilterOptions(topicFilter, topics);
+    renderMapItems();
+    pickQuestions();
+  </script>
 </body>
 </html>
