@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ГеоКонтроль — Контрольные по материкам</title>
+  <title>GeoVibe Quiz — прокачай географию</title>
   <style>
     :root {
-      --bg: #eef6ff;
-      --card: #ffffff;
-      --text: #173956;
-      --muted: #5c7b95;
-      --accent: #1876d1;
-      --accent-dark: #0c5da8;
-      --ok: #178a5a;
-      --bad: #c83d33;
-      --border: #d5e5f4;
+      --bg1: #090a1e;
+      --bg2: #12152f;
+      --card: rgba(18, 24, 50, 0.78);
+      --card-strong: rgba(24, 31, 64, 0.95);
+      --text: #eaf1ff;
+      --muted: #a9b9d9;
+      --accent: #7a5cff;
+      --accent-2: #26d8ff;
+      --ok: #2be38f;
+      --bad: #ff5a82;
+      --border: rgba(154, 180, 255, 0.22);
+      --glow: 0 0 0 1px rgba(126, 199, 255, 0.16), 0 18px 45px rgba(0, 0, 0, 0.45);
     }
 
     * { box-sizing: border-box; }
@@ -23,71 +26,80 @@
       margin: 0;
       font-family: "Inter", "Segoe UI", Arial, sans-serif;
       color: var(--text);
-      background: linear-gradient(180deg, #e8f3ff 0%, #f8fbff 45%, #edf6ff 100%);
+      background:
+        radial-gradient(circle at 15% 20%, #1e2759 0%, transparent 35%),
+        radial-gradient(circle at 85% 15%, #2a1761 0%, transparent 30%),
+        linear-gradient(150deg, var(--bg1) 0%, var(--bg2) 55%, #0d122b 100%);
       min-height: 100vh;
     }
 
     .container {
-      max-width: 920px;
+      max-width: 980px;
       margin: 0 auto;
-      padding: 26px 16px 40px;
+      padding: 30px 16px 42px;
     }
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(7, 57, 102, 0.09);
-      padding: 18px;
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: var(--glow);
+      padding: 20px;
     }
 
     h1 {
-      margin: 0 0 8px;
+      margin: 0 0 10px;
       text-align: center;
-      font-size: clamp(1.7rem, 2.5vw, 2.2rem);
+      font-size: clamp(1.9rem, 3vw, 2.7rem);
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 30px rgba(122, 92, 255, 0.4);
     }
 
     .subtitle {
-      margin: 0 0 18px;
+      margin: 0 0 20px;
       color: var(--muted);
       text-align: center;
     }
 
     select, button, input[type="text"] {
       font: inherit;
-      border-radius: 10px;
-      border: 1px solid #b9d3eb;
-      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(166, 188, 255, 0.32);
+      padding: 10px 12px;
       color: var(--text);
-      background: #fff;
+      background: rgba(12, 18, 40, 0.85);
       width: 100%;
     }
+
+    input[type="text"]::placeholder { color: #8ea4ca; }
 
     .home {
       display: grid;
       gap: 12px;
-      max-width: 520px;
+      max-width: 560px;
       margin: 0 auto;
     }
 
     button {
       border: none;
-      background: var(--accent);
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
       color: #fff;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: transform 0.18s ease, filter 0.18s ease;
     }
 
-    button:hover { background: var(--accent-dark); }
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
 
     .ghost {
-      background: #e9f2fc;
+      background: rgba(138, 160, 255, 0.16);
       color: var(--text);
       border: 1px solid var(--border);
     }
-
-    .ghost:hover { background: #ddeaf8; }
 
     .quiz-head {
       display: flex;
@@ -100,8 +112,8 @@
 
     .question {
       border: 1px solid var(--border);
-      border-radius: 12px;
-      background: #fcfeff;
+      border-radius: 14px;
+      background: var(--card-strong);
       padding: 12px;
       margin-bottom: 10px;
     }
@@ -109,32 +121,34 @@
     .question p {
       margin: 0 0 8px;
       font-weight: 600;
+      line-height: 1.35;
     }
 
     .answers {
       display: grid;
-      gap: 6px;
+      gap: 7px;
     }
 
     .option {
-      border: 1px solid #d3e4f4;
-      border-radius: 10px;
+      border: 1px solid rgba(146, 171, 255, 0.3);
+      border-radius: 11px;
       padding: 8px;
       display: flex;
       gap: 8px;
       align-items: center;
+      background: rgba(20, 27, 57, 0.72);
     }
 
     .status {
-      margin-top: 10px;
+      margin-top: 12px;
       min-height: 1.3em;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .correct-answer {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 0.95rem;
+      margin: 9px 0 0;
+      color: #9ec7ff;
+      font-size: 0.93rem;
       font-weight: 600;
     }
 
@@ -145,24 +159,24 @@
 </head>
 <body>
   <div class="container">
-    <h1>ГеоКонтроль</h1>
-    <p class="subtitle">Выберите материк и получите 10 вопросов для контрольной.</p>
+    <h1>GeoVibe Quiz ✨</h1>
+    <p class="subtitle">Выбирай материк, лови 10 вопросов и проверь свой гео-скилл.</p>
 
     <section id="home-screen" class="card">
       <div class="home">
-        <label for="continent-select">Какой материк вы хотите выбрать?</label>
+        <label for="continent-select">Какой материк выбираем сегодня?</label>
         <select id="continent-select"></select>
-        <button id="start-btn">Начать тест из 10 вопросов</button>
+        <button id="start-btn">Поехали! 10 вопросов</button>
       </div>
     </section>
 
     <section id="quiz-screen" class="card hidden">
       <div class="quiz-head">
         <strong id="quiz-title"></strong>
-        <button id="back-btn" class="ghost" style="width:auto;">Сменить материк</button>
+        <button id="back-btn" class="ghost" style="width:auto;">Выбрать другой материк</button>
       </div>
       <div id="question-list"></div>
-      <button id="check-btn">Проверить ответы</button>
+      <button id="check-btn">Проверить и показать результат</button>
       <p id="quiz-status" class="status"></p>
     </section>
   </div>
