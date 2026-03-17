@@ -233,7 +233,7 @@
       currentQuestions = getRandomQuestions(continent);
       questionList.innerHTML = "";
       quizStatus.textContent = "";
-      quizTitle.textContent = `Материк: ${continent} • Случайные вопросы: ${currentQuestions.length}/20`;
+      quizTitle.textContent = `Материк: ${continent} • Случайные вопросы: ${currentQuestions.length}/${questionBank[continent].length}`;
 
       currentQuestions.forEach((q, index) => {
         const card = document.createElement("div");
