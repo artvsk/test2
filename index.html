@@ -196,7 +196,7 @@
 
   <script src="questions-data.js"></script>
   <script>
-    const questionBank = window.quizQuestionBank;
+    const questionBank = window.quizQuestionBank || {};
 
     const continentSelect = document.getElementById("continent-select");
     const startBtn = document.getElementById("start-btn");
@@ -212,7 +212,20 @@
 
     function fillContinents() {
       continentSelect.innerHTML = "";
-      Object.keys(questionBank).forEach(continent => {
+      const continents = Object.keys(questionBank);
+
+      if (!continents.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Вопросы не загрузились";
+        continentSelect.appendChild(option);
+        startBtn.disabled = true;
+        startBtn.textContent = "Ошибка загрузки";
+        return;
+      }
+
+      startBtn.disabled = false;
+      continents.forEach(continent => {
         const option = document.createElement("option");
         option.value = continent;
         option.textContent = continent;
