@@ -2,11 +2,363 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Мой сайт</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TerraRush Quiz — география на максималках</title>
+  <style>
+    :root {
+      --bg1: #070510;
+      --bg2: #0f1a2b;
+      --card: rgba(11, 19, 38, 0.78);
+      --card-strong: rgba(15, 27, 53, 0.92);
+      --text: #eaf1ff;
+      --muted: #a9b9d9;
+      --accent: #ff3cac;
+      --accent-2: #21f6ff;
+      --ok: #2be38f;
+      --bad: #ff5a82;
+      --border: rgba(154, 180, 255, 0.22);
+      --glow: 0 0 0 1px rgba(126, 199, 255, 0.16), 0 18px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 60, 172, 0.28) 0%, transparent 32%),
+        radial-gradient(circle at 85% 14%, rgba(33, 246, 255, 0.24) 0%, transparent 36%),
+        repeating-linear-gradient(90deg, rgba(33, 246, 255, 0.08) 0 1px, transparent 1px 80px),
+        repeating-linear-gradient(0deg, rgba(255, 60, 172, 0.06) 0 1px, transparent 1px 80px),
+        linear-gradient(145deg, var(--bg1) 0%, var(--bg2) 48%, #05070f 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 70% 70%, rgba(255, 60, 172, 0.14), transparent 45%);
+      mix-blend-mode: screen;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 30px 16px 42px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      border-radius: 18px;
+      box-shadow: var(--glow);
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      text-align: center;
+      font-size: clamp(1.9rem, 3vw, 2.7rem);
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 18px rgba(255, 60, 172, 0.55), 0 0 34px rgba(33, 246, 255, 0.35);
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    select, button, input[type="text"] {
+      font: inherit;
+      border-radius: 12px;
+      border: 1px solid rgba(166, 188, 255, 0.32);
+      padding: 10px 12px;
+      color: var(--text);
+      background: rgba(12, 18, 40, 0.85);
+      width: 100%;
+    }
+
+    input[type="text"]::placeholder { color: #8ea4ca; }
+
+    select option {
+      color: #0f172a;
+      background: #eef6ff;
+    }
+
+    .home {
+      display: grid;
+      gap: 12px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    button {
+      border: none;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, filter 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .ghost {
+      background: rgba(138, 160, 255, 0.16);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .quiz-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .question {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--card-strong);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .question p {
+      margin: 0 0 8px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .answers {
+      display: grid;
+      gap: 7px;
+    }
+
+    .option {
+      border: 1px solid rgba(146, 171, 255, 0.3);
+      border-radius: 11px;
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(20, 27, 57, 0.72);
+    }
+
+    .status {
+      margin-top: 12px;
+      min-height: 1.3em;
+      font-weight: 800;
+    }
+
+    .correct-answer {
+      margin: 9px 0 0;
+      color: #9ec7ff;
+      font-size: 0.93rem;
+      font-weight: 600;
+    }
+
+    .ok { color: var(--ok); }
+    .bad { color: var(--bad); }
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
-  <h1>Привет!</h1>
-  <p>Это мой сайт на GitHub Pages.</p>
+  <div class="container">
+    <h1>TerraRush Quiz 🚀</h1>
+    <p class="subtitle">&nbsp;</p>
+
+    <section id="home-screen" class="card">
+      <div class="home">
+        <label for="continent-select">Какой материк выбираем сегодня?</label>
+        <select id="continent-select">
+          <option value="Европа">Европа</option>
+          <option value="Азия">Азия</option>
+          <option value="Африка">Африка</option>
+          <option value="Северная Америка">Северная Америка</option>
+          <option value="Южная Америка">Южная Америка</option>
+          <option value="Австралия">Австралия</option>
+          <option value="Антарктида">Антарктида</option>
+        </select>
+        <button id="start-btn">Поехали! Начать тест</button>
+      </div>
+    </section>
+
+    <section id="quiz-screen" class="card hidden">
+      <div class="quiz-head">
+        <strong id="quiz-title"></strong>
+        <button id="back-btn" class="ghost" style="width:auto;">Выбрать другой материк</button>
+      </div>
+      <div id="question-list"></div>
+      <button id="check-btn">Проверить и показать результат</button>
+      <p id="quiz-status" class="status"></p>
+    </section>
+  </div>
+
+  <script src="questions-data.js"></script>
+  <script>
+    const fallbackQuestionBank = {
+      "Европа": [{ type: "single", text: "Столица Франции?", options: ["Париж", "Рим", "Берлин"], correct: "Париж" }],
+      "Азия": [{ type: "single", text: "Самая высокая горная система Азии?", options: ["Гималаи", "Альпы", "Урал"], correct: "Гималаи" }],
+      "Африка": [{ type: "single", text: "Крупнейшая пустыня Африки?", options: ["Сахара", "Гоби", "Атакама"], correct: "Сахара" }],
+      "Северная Америка": [{ type: "single", text: "Крупная река США?", options: ["Миссисипи", "Нил", "Рейн"], correct: "Миссисипи" }],
+      "Южная Америка": [{ type: "single", text: "Самая полноводная река мира?", options: ["Амазонка", "Янцзы", "Дунай"], correct: "Амазонка" }],
+      "Австралия": [{ type: "single", text: "Столица Австралии?", options: ["Канберра", "Сидней", "Мельбурн"], correct: "Канберра" }],
+      "Антарктида": [{ type: "single", text: "Какой полюс расположен в Антарктиде?", options: ["Южный", "Северный", "Никакой"], correct: "Южный" }]
+    };
+
+    const questionBank = window.quizQuestionBank && Object.keys(window.quizQuestionBank).length
+      ? window.quizQuestionBank
+      : fallbackQuestionBank;
+
+    const continentSelect = document.getElementById("continent-select");
+    const startBtn = document.getElementById("start-btn");
+    const backBtn = document.getElementById("back-btn");
+    const checkBtn = document.getElementById("check-btn");
+    const homeScreen = document.getElementById("home-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const questionList = document.getElementById("question-list");
+    const quizTitle = document.getElementById("quiz-title");
+    const quizStatus = document.getElementById("quiz-status");
+
+    let currentQuestions = [];
+
+    function fillContinents() {
+      const continents = Object.keys(questionBank);
+
+      if (!continents.length) {
+        return;
+      }
+
+      continentSelect.innerHTML = "";
+      startBtn.disabled = false;
+      startBtn.textContent = "Поехали! Начать тест";
+      continents.forEach(continent => {
+        const option = document.createElement("option");
+        option.value = continent;
+        option.textContent = continent;
+        continentSelect.appendChild(option);
+      });
+    }
+
+    function getRandomQuestions(continent) {
+      const all = [...questionBank[continent]];
+      for (let i = all.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [all[i], all[j]] = [all[j], all[i]];
+      }
+      return all.slice(0, 10);
+    }
+
+    function renderQuestions(continent) {
+      currentQuestions = getRandomQuestions(continent);
+      questionList.innerHTML = "";
+      quizStatus.textContent = "";
+      quizTitle.textContent = `Материк: ${continent} • Случайные вопросы: ${currentQuestions.length}/${(questionBank[continent] || []).length}`;
+
+      currentQuestions.forEach((q, index) => {
+        const card = document.createElement("div");
+        card.className = "question";
+        card.dataset.type = q.type;
+        card.dataset.correct = JSON.stringify(q.correct);
+
+        const title = document.createElement("p");
+        title.textContent = `${index + 1}. ${q.text}`;
+        card.appendChild(title);
+
+        if (q.type === "single") {
+          const answers = document.createElement("div");
+          answers.className = "answers";
+
+          q.options.forEach(optionText => {
+            const label = document.createElement("label");
+            label.className = "option";
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = `q-${index}`;
+            radio.value = optionText;
+            label.append(radio, document.createTextNode(optionText));
+            answers.appendChild(label);
+          });
+
+          card.appendChild(answers);
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.placeholder = "Введите ответ";
+          input.dataset.role = "text";
+          card.appendChild(input);
+        }
+
+        const correctText = document.createElement("p");
+        correctText.className = "correct-answer hidden";
+        card.appendChild(correctText);
+
+        questionList.appendChild(card);
+      });
+    }
+
+    function normalize(value) {
+      return value.trim().toLowerCase().replace(/ё/g, "е");
+    }
+
+    startBtn.addEventListener("click", () => {
+      const continent = continentSelect.value;
+      renderQuestions(continent);
+      homeScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+    });
+
+    backBtn.addEventListener("click", () => {
+      quizScreen.classList.add("hidden");
+      homeScreen.classList.remove("hidden");
+      quizStatus.textContent = "";
+    });
+
+    checkBtn.addEventListener("click", () => {
+      const cards = questionList.querySelectorAll(".question");
+      let correctCount = 0;
+
+      cards.forEach(card => {
+        const type = card.dataset.type;
+        const correct = JSON.parse(card.dataset.correct);
+        let isCorrect = false;
+
+        if (type === "single") {
+          const picked = card.querySelector("input[type='radio']:checked");
+          isCorrect = Boolean(picked && picked.value === correct);
+        } else {
+          const userValue = normalize(card.querySelector("input[data-role='text']").value);
+          const valid = Array.isArray(correct) ? correct.map(normalize) : [normalize(correct)];
+          isCorrect = valid.includes(userValue);
+        }
+
+        const rightAnswers = Array.isArray(correct) ? correct : [correct];
+        const answerText = card.querySelector(".correct-answer");
+        answerText.textContent = `Правильный ответ: ${rightAnswers.join(" / ")}`;
+        answerText.classList.remove("hidden");
+
+        card.style.borderColor = isCorrect ? "#2e9d69" : "#d35454";
+        if (isCorrect) correctCount += 1;
+      });
+
+      quizStatus.className = `status ${correctCount === cards.length ? "ok" : "bad"}`;
+      quizStatus.textContent = `Результат: ${correctCount}/${cards.length}`;
+    });
+
+    fillContinents();
+  </script>
 </body>
 </html>
