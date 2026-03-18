@@ -209,7 +209,19 @@
 
   <script src="questions-data.js"></script>
   <script>
-    const questionBank = window.quizQuestionBank || {};
+    const fallbackQuestionBank = {
+      "Европа": [{ type: "single", text: "Столица Франции?", options: ["Париж", "Рим", "Берлин"], correct: "Париж" }],
+      "Азия": [{ type: "single", text: "Самая высокая горная система Азии?", options: ["Гималаи", "Альпы", "Урал"], correct: "Гималаи" }],
+      "Африка": [{ type: "single", text: "Крупнейшая пустыня Африки?", options: ["Сахара", "Гоби", "Атакама"], correct: "Сахара" }],
+      "Северная Америка": [{ type: "single", text: "Крупная река США?", options: ["Миссисипи", "Нил", "Рейн"], correct: "Миссисипи" }],
+      "Южная Америка": [{ type: "single", text: "Самая полноводная река мира?", options: ["Амазонка", "Янцзы", "Дунай"], correct: "Амазонка" }],
+      "Австралия": [{ type: "single", text: "Столица Австралии?", options: ["Канберра", "Сидней", "Мельбурн"], correct: "Канберра" }],
+      "Антарктида": [{ type: "single", text: "Какой полюс расположен в Антарктиде?", options: ["Южный", "Северный", "Никакой"], correct: "Южный" }]
+    };
+
+    const questionBank = window.quizQuestionBank && Object.keys(window.quizQuestionBank).length
+      ? window.quizQuestionBank
+      : fallbackQuestionBank;
 
     const continentSelect = document.getElementById("continent-select");
     const startBtn = document.getElementById("start-btn");
@@ -227,13 +239,12 @@
       const continents = Object.keys(questionBank);
 
       if (!continents.length) {
-        startBtn.disabled = true;
-        startBtn.textContent = "Ошибка загрузки";
         return;
       }
 
       continentSelect.innerHTML = "";
       startBtn.disabled = false;
+      startBtn.textContent = "Поехали! Начать тест";
       continents.forEach(continent => {
         const option = document.createElement("option");
         option.value = continent;
@@ -255,7 +266,7 @@
       currentQuestions = getRandomQuestions(continent);
       questionList.innerHTML = "";
       quizStatus.textContent = "";
-      quizTitle.textContent = `Материк: ${continent} • Случайные вопросы: ${currentQuestions.length}/${questionBank[continent].length}`;
+      quizTitle.textContent = `Материк: ${continent} • Случайные вопросы: ${currentQuestions.length}/${(questionBank[continent] || []).length}`;
 
       currentQuestions.forEach((q, index) => {
         const card = document.createElement("div");
