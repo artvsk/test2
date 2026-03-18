@@ -2,11 +2,505 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Мой сайт</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TerraRush Quiz — география на максималках</title>
+  <style>
+    :root {
+      --bg1: #070510;
+      --bg2: #0f1a2b;
+      --card: rgba(11, 19, 38, 0.78);
+      --card-strong: rgba(15, 27, 53, 0.92);
+      --text: #eaf1ff;
+      --muted: #a9b9d9;
+      --accent: #ff3cac;
+      --accent-2: #21f6ff;
+      --ok: #2be38f;
+      --bad: #ff5a82;
+      --border: rgba(154, 180, 255, 0.22);
+      --glow: 0 0 0 1px rgba(126, 199, 255, 0.16), 0 18px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 60, 172, 0.28) 0%, transparent 32%),
+        radial-gradient(circle at 85% 14%, rgba(33, 246, 255, 0.24) 0%, transparent 36%),
+        repeating-linear-gradient(90deg, rgba(33, 246, 255, 0.08) 0 1px, transparent 1px 80px),
+        repeating-linear-gradient(0deg, rgba(255, 60, 172, 0.06) 0 1px, transparent 1px 80px),
+        linear-gradient(145deg, var(--bg1) 0%, var(--bg2) 48%, #05070f 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 70% 70%, rgba(255, 60, 172, 0.14), transparent 45%);
+      mix-blend-mode: screen;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 30px 16px 42px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      border-radius: 18px;
+      box-shadow: var(--glow);
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      text-align: center;
+      font-size: clamp(1.9rem, 3vw, 2.7rem);
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 18px rgba(255, 60, 172, 0.55), 0 0 34px rgba(33, 246, 255, 0.35);
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    select, button, input[type="text"] {
+      font: inherit;
+      border-radius: 12px;
+      border: 1px solid rgba(166, 188, 255, 0.32);
+      padding: 10px 12px;
+      color: var(--text);
+      background: rgba(12, 18, 40, 0.85);
+      width: 100%;
+    }
+
+    input[type="text"]::placeholder { color: #8ea4ca; }
+
+    .home {
+      display: grid;
+      gap: 12px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    button {
+      border: none;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, filter 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .ghost {
+      background: rgba(138, 160, 255, 0.16);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .quiz-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .question {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--card-strong);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .question p {
+      margin: 0 0 8px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .answers {
+      display: grid;
+      gap: 7px;
+    }
+
+    .option {
+      border: 1px solid rgba(146, 171, 255, 0.3);
+      border-radius: 11px;
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(20, 27, 57, 0.72);
+    }
+
+    .status {
+      margin-top: 12px;
+      min-height: 1.3em;
+      font-weight: 800;
+    }
+
+    .correct-answer {
+      margin: 9px 0 0;
+      color: #9ec7ff;
+      font-size: 0.93rem;
+      font-weight: 600;
+    }
+
+    .ok { color: var(--ok); }
+    .bad { color: var(--bad); }
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
-  <h1>Привет!</h1>
-  <p>Это мой сайт на GitHub Pages.</p>
+  <div class="container">
+    <h1>TerraRush Quiz 🚀</h1>
+    <p class="subtitle">&nbsp;</p>
+
+    <section id="home-screen" class="card">
+      <div class="home">
+        <label for="continent-select">Какой материк выбираем сегодня?</label>
+        <select id="continent-select"></select>
+        <button id="start-btn">Поехали! Начать тест</button>
+      </div>
+    </section>
+
+    <section id="quiz-screen" class="card hidden">
+      <div class="quiz-head">
+        <strong id="quiz-title"></strong>
+        <button id="back-btn" class="ghost" style="width:auto;">Выбрать другой материк</button>
+      </div>
+      <div id="question-list"></div>
+      <button id="check-btn">Проверить и показать результат</button>
+      <p id="quiz-status" class="status"></p>
+    </section>
+  </div>
+
+  <script>
+    const questionBank = {
+      "Европа": [
+        { type: "single", text: "Какой самый северный полуостров?", options: ["Индокитай", "Скандинавский", "Таймыр"], correct: "Скандинавский" },
+        { type: "single", text: "Какой самый крупный остров Европы?", options: ["Кипр", "Исландия", "Великобритания"], correct: "Великобритания" },
+        { type: "text", text: "Назовите море к востоку от Англии.", correct: ["Северное"] },
+        { type: "single", text: "Какое море к северу от Норвегии?", options: ["Черное", "Карское", "Норвежское"], correct: "Норвежское" },
+        { type: "single", text: " Какой самый северный остров в Европе?", options: ["Великобритания", "Исландия", "Крит"], correct: "Исландия" },
+        { type: "text", text: "Назовите море к западу от полуострова Таймыр.", correct: ["Карское", "Баренцево"] },
+        { type: "single", text: "Какой мыс находится на Пиренейском п-ове?", options: ["Мыс Рока", "Мыс Дежнёва", "Мыс Челюскин"], correct: "Мыс Рока" },
+        { type: "single", text: "Какой залив рядом с Приенейским п-ов?", options: ["Бискайский", "Персидский", "Бенгальский"], correct: "Бискайский" },
+        { type: "text", text: "Какой канал сеодиняет Красное море и Средиземное море", options: ["Суецкий", "Кильский", "Рейн-Майн-Дунай"], correct: ["Суецкий"] },
+        { type: "single", text: "Какие горы расположены между Францией и Испанией?", options: ["Пиренеи", "Карпаты", "Кавказ"], correct: "Пиренеи" }
+      ],
+      "Азия": [
+        { type: "single", text: "Какой тип климата преобладает в Юго-Восточной Азии?", options: ["Муссонный", "Арктический", "Морской"], correct: "Муссонный" },
+        { type: "single", text: "Какая высочайшая горная система мира находится в Азии?", options: ["Альпы", "Гималаи", "Аппалачи"], correct: "Гималаи" },
+        { type: "text", text: "Назовите самую высокую вершину мира.", correct: ["эверест", "джомолунгма"] },
+        { type: "single", text: "Какая крупная река протекает в Китае?", options: ["Янцзы", "Нил", "Дунай"], correct: "Янцзы" },
+        { type: "single", text: "Какой ресурс особенно важен для стран Персидского залива?", options: ["Нефть", "Лес", "Торф"], correct: "Нефть" },
+        { type: "text", text: "Назовите крупнейший по населению регион Азии: Южная, Восточная или Северная?", correct: ["южная", "восточная"] },
+        { type: "single", text: "Какая пустыня находится в Монголии и Китае?", options: ["Гоби", "Сахара", "Атакама"], correct: "Гоби" },
+        { type: "single", text: "Какой пояс характерен для крайнего севера Сибири?", options: ["Арктический", "Субэкваториальный", "Тропический"], correct: "Арктический" },
+        { type: "text", text: "Какая страна занимает большую часть Индостанского полуострова?", correct: ["индия"] },
+        { type: "single", text: "Какое море омывает Японию с запада?", options: ["Японское", "Аравийское", "Карибское"], correct: "Японское" }
+      ],
+      "Африка": [
+        { type: "single", text: "Какая пустыня является крупнейшей жаркой пустыней мира?", options: ["Гоби", "Сахара", "Калахари"], correct: "Сахара" },
+        { type: "single", text: "Какая река считается самой длинной в Африке?", options: ["Конго", "Нил", "Нигер"], correct: "Нил" },
+        { type: "text", text: "Какой климат преобладает в центральной части Африки около экватора?", correct: ["экваториальный"] },
+        { type: "single", text: "Какая страна известна крупной добычей алмазов?", options: ["Ботсвана", "Португалия", "Таиланд"], correct: "Ботсвана" },
+        { type: "single", text: "Какая природная зона занимает большие площади к югу от Сахары?", options: ["Саванна", "Тундра", "Тайга"], correct: "Саванна" },
+        { type: "text", text: "Назовите самое большое по площади озеро Африки (по поверхности).", correct: ["виктория", "озеро виктория"] },
+        { type: "single", text: "Какие горы находятся на северо-западе Африки?", options: ["Атлас", "Урал", "Анды"], correct: "Атлас" },
+        { type: "single", text: "В какой части Африки население размещено наиболее неравномерно?", options: ["В районах пустынь", "На побережьях и в долинах рек", "Оба варианта верны"], correct: "Оба варианта верны" },
+        { type: "text", text: "Назовите остров у восточного побережья Африки, один из крупнейших в мире.", correct: ["мадагаскар"] },
+        { type: "single", text: "Какой океан омывает восточное побережье Африки?", options: ["Индийский", "Северный Ледовитый", "Тихий"], correct: "Индийский" }
+      ],
+      "Северная Америка": [
+        { type: "single", text: "Какая горная система проходит вдоль западной части материка?", options: ["Кордильеры", "Аппенины", "Альпы"], correct: "Кордильеры" },
+        { type: "single", text: "Какой климатический пояс характерен для крайнего севера Канады?", options: ["Арктический", "Тропический", "Субэкваториальный"], correct: "Арктический" },
+        { type: "text", text: "Назовите одну из Великих озёр.", correct: ["верхнее", "мичиган", "гурон", "эри", "онтарио"] },
+        { type: "single", text: "Какая река является одной из главных водных артерий США?", options: ["Миссисипи", "Амур", "Рейн"], correct: "Миссисипи" },
+        { type: "single", text: "Какой природный ресурс играет важную роль в экономике Канады?", options: ["Лес", "Оливки", "Рис"], correct: "Лес" },
+        { type: "text", text: "Как называется тёплое течение у восточного побережья США?", correct: ["гольфстрим"] },
+        { type: "single", text: "Где плотность населения в Северной Америке выше всего?", options: ["Север Канады", "Побережья и крупные города", "Горные районы Аляски"], correct: "Побережья и крупные города" },
+        { type: "single", text: "Какая страна занимает большую часть материка по площади?", options: ["США", "Канада", "Мексика"], correct: "Канада" },
+        { type: "text", text: "Как называется узкий перешеек, соединяющий Северную и Южную Америку?", correct: ["панамский", "панамский перешеек"] },
+        { type: "single", text: "Какой океан омывает западное побережье Северной Америки?", options: ["Тихий", "Индийский", "Атлантический"], correct: "Тихий" }
+      ],
+      "Южная Америка": [
+        { type: "single", text: "Какая горная система тянется вдоль западного побережья материка?", options: ["Анды", "Кордильеры", "Карпаты"], correct: "Анды" },
+        { type: "single", text: "Какая река является самой полноводной в мире?", options: ["Амазонка", "Нил", "Лена"], correct: "Амазонка" },
+        { type: "text", text: "Как называется влажная экваториальная природная зона Амазонии?", correct: ["сельва", "влажные экваториальные леса"] },
+        { type: "single", text: "Какой климат преобладает в бассейне Амазонки?", options: ["Экваториальный", "Арктический", "Средиземноморский"], correct: "Экваториальный" },
+        { type: "single", text: "Какая страна крупнейшая по площади в Южной Америке?", options: ["Аргентина", "Бразилия", "Перу"], correct: "Бразилия" },
+        { type: "text", text: "Назовите пустыню на тихоокеанском побережье Чили.", correct: ["атакама", "пустыня атакама"] },
+        { type: "single", text: "Какой ресурс важен для Чили?", options: ["Медь", "Уголь", "Никель"], correct: "Медь" },
+        { type: "single", text: "Где плотность населения обычно выше?", options: ["В Андах и мегаполисах", "В центральной Амазонии", "В Патагонии"], correct: "В Андах и мегаполисах" },
+        { type: "text", text: "Как называется плато в центральной части Бразилии?", correct: ["бразильское плоскогорье", "бразильское"] },
+        { type: "single", text: "Какой океан омывает восточное побережье Южной Америки?", options: ["Атлантический", "Северный Ледовитый", "Индийский"], correct: "Атлантический" }
+      ],
+      "Австралия": [
+        { type: "single", text: "Какая природная зона занимает большую часть центра Австралии?", options: ["Пустыни и полупустыни", "Тайга", "Тундра"], correct: "Пустыни и полупустыни" },
+        { type: "single", text: "Как называется крупнейший коралловый риф у северо-восточного побережья?", options: ["Большой Барьерный риф", "Белизский риф", "Мезоамериканский риф"], correct: "Большой Барьерный риф" },
+        { type: "text", text: "Назовите столицу Австралии.", correct: ["канберра"] },
+        { type: "single", text: "Какой климат преобладает во внутренних районах материка?", options: ["Засушливый", "Экваториальный", "Субарктический"], correct: "Засушливый" },
+        { type: "single", text: "Какие полезные ископаемые особенно важны для Австралии?", options: ["Железная руда и уголь", "Нефть и газ только", "Алмазы только"], correct: "Железная руда и уголь" },
+        { type: "text", text: "Как называется горная система на востоке Австралии?", correct: ["большой водораздельный хребет", "водораздельный хребет"] },
+        { type: "single", text: "Где сосредоточено больше населения Австралии?", options: ["На побережье", "В центральных пустынях", "В высокогорьях"], correct: "На побережье" },
+        { type: "single", text: "Какой океан омывает западное побережье Австралии?", options: ["Индийский", "Атлантический", "Северный Ледовитый"], correct: "Индийский" },
+        { type: "text", text: "Назовите самый крупный остров к югу от материковой Австралии.", correct: ["тасмания"] },
+        { type: "single", text: "Какая страна полностью расположена на материке Австралия?", options: ["Австралия", "Новая Зеландия", "Папуа — Новая Гвинея"], correct: "Австралия" }
+      ],
+      "Антарктида": [
+        { type: "single", text: "Какой климат характерен для Антарктиды?", options: ["Тропический", "Полярный", "Умеренный"], correct: "Полярный" },
+        { type: "single", text: "Как называется крупнейший ледниковый щит Антарктиды?", options: ["Антарктический ледниковый щит", "Гренландский щит", "Скандинавский щит"], correct: "Антарктический ледниковый щит" },
+        { type: "text", text: "Как называется океан, окружающий Антарктиду?", correct: ["южный", "южный океан"] },
+        { type: "single", text: "Какой тип постоянного населения у Антарктиды?", options: ["Много постоянных городов", "Постоянного населения нет", "Только сельское население"], correct: "Постоянного населения нет" },
+        { type: "single", text: "Кто работает на материке в основном?", options: ["Только туристы", "Учёные и персонал станций", "Шахтёры"], correct: "Учёные и персонал станций" },
+        { type: "text", text: "Как называется крупнейший полуостров Антарктиды, направленный к Южной Америке?", correct: ["антарктический полуостров"] },
+        { type: "single", text: "Какой ресурс Антарктиды важен для всего мира?", options: ["Запасы пресной воды в льде", "Тропические леса", "Пахотные земли"], correct: "Запасы пресной воды в льде" },
+        { type: "single", text: "Какой полюс расположен в Антарктиде?", options: ["Северный", "Южный", "Магнитный экватор"], correct: "Южный" },
+        { type: "text", text: "Какие животные особенно ассоциируются с Антарктидой?", correct: ["пингвины", "пингвин"] },
+        { type: "single", text: "Какой международный документ регулирует мирное использование материка?", options: ["Договор об Антарктике", "Парижское соглашение", "Киотский протокол"], correct: "Договор об Антарктике" }
+      ]
+    };
+
+
+
+    const extraQuestionBank = {
+      "Европа": [
+        { type: "single", text: "Какое море омывает границы прибалтики?", options: ["Аравийское", "Чёрное", "Балтийское"], correct: "Балтийское" },
+        { type: "single", text: "Какой пролив с западной стороный средиземного моря?", options: ["Баб-Эль-Мандебский", "Гибралтар", "Босфор"], correct: "Гибралтар" },
+        { type: "text", text: "Пролив который соединяет чёрное море со средиземным?", correct: ["Босфор", "Пролив Босфор"] },
+        { type: "single", text: " Как называется остров государства в Средиземном море?", options: ["Кипр", "Шри-Ланка", "Филипинны"], correct: "Кипр" },
+        { type: "text", text: "Залив между Францией и Испанией", correct: ["бискайский", "бискайский пролив"] },
+        { type: "single", text: "Как называется пролив между Великобритании и Францией?", options: ["Гибралтар", "Ормузский", "Ла-Манш"], correct: "Ла-Манш" },
+        { type: "single", text: "Как называется единственный полуостров в чёрном море?", options: ["Крымский", "Индостан", "Таймыр"], correct: "Крымский" },
+        { type: "text", text: "Полуостров-сапожок.", correct: ["Апеннинский"] }
+      ],
+      "Азия": [
+        { type: "single", text: "Какая страна находится и в Европе, и в Азии?", options: ["Турция", "Япония", "Китай"], correct: "Турция" },
+        { type: "text", text: "Назовите крупнейшее озеро мира по площади, расположенное в Азии.", correct: ["каспийское море", "каспий"] },
+        { type: "single", text: "Какой океан омывает восток Азии?", options: ["Тихий", "Атлантический", "Северный Ледовитый"], correct: "Тихий" },
+        { type: "single", text: "Какая пустыня расположена на Аравийском полуострове?", options: ["Руб-эль-Хали", "Сахара", "Калахари"], correct: "Руб-эль-Хали" },
+        { type: "text", text: "Назовите столицу Южной Кореи.", correct: ["сеул"] },
+        { type: "single", text: "Какая река протекает через Индию и Бангладеш и образует дельту?", options: ["Ганг", "Енисей", "Евфрат"], correct: "Ганг" },
+        { type: "text", text: "Назовите столицу Индонезии.", correct: ["джакарта"] },
+        { type: "single", text: "Какой полуостров является самым крупным в Азии?", options: ["Аравийский", "Скандинавский", "Кольский"], correct: "Аравийский" },
+        { type: "single", text: "Какая страна считается островным государством в Восточной Азии?", options: ["Япония", "Непал", "Монголия"], correct: "Япония" },
+        { type: "text", text: "Назовите столицу Таиланда.", correct: ["бангкок"] }
+      ],
+      "Африка": [
+        { type: "single", text: "Какое море отделяет Африку от Европы?", options: ["Средиземное", "Карибское", "Японское"], correct: "Средиземное" },
+        { type: "text", text: "Назовите самую южную страну Африки по материку.", correct: ["юар", "южно-африканская республика", "южная африка"] },
+        { type: "single", text: "Какая река впадает в Гвинейский залив?", options: ["Нигер", "Замбези", "Лимпопо"], correct: "Нигер" },
+        { type: "single", text: "Где находится водопад Виктория?", options: ["На реке Замбези", "На реке Нил", "На реке Конго"], correct: "На реке Замбези" },
+        { type: "text", text: "Как называется самая высокая гора Африки?", correct: ["килиманджаро"] },
+        { type: "single", text: "Какая страна Африки пересекается экватором?", options: ["Кения", "Марокко", "Тунис"], correct: "Кения" },
+        { type: "text", text: "Назовите столицу Египта.", correct: ["каир"] },
+        { type: "single", text: "Какой пролив отделяет Африку от Аравийского полуострова?", options: ["Баб-эль-Мандебский", "Гибралтарский", "Берингов"], correct: "Баб-эль-Мандебский" },
+        { type: "single", text: "Какое озеро является самым глубоким в Африке?", options: ["Танганьика", "Виктория", "Чад"], correct: "Танганьика" },
+        { type: "text", text: "Назовите столицу Эфиопии.", correct: ["аддис-абеба", "аддис абеба"] }
+      ],
+      "Северная Америка": [
+        { type: "single", text: "Какая река проходит через Гранд-Каньон?", options: ["Колорадо", "Юкон", "Маккензи"], correct: "Колорадо" },
+        { type: "text", text: "Назовите столицу Канады.", correct: ["оттава"] },
+        { type: "single", text: "Какой залив расположен на северо-востоке Канады?", options: ["Гудзонов", "Бенгальский", "Мексиканский"], correct: "Гудзонов" },
+        { type: "single", text: "Какая страна Центральной Америки имеет Панамский канал?", options: ["Панама", "Куба", "Гватемала"], correct: "Панама" },
+        { type: "text", text: "Назовите крупнейший остров мира рядом с материком Северная Америка.", correct: ["гренландия"] },
+        { type: "single", text: "Какая пустыня находится на севере Мексики и юге США?", options: ["Сонора", "Сахара", "Каракумы"], correct: "Сонора" },
+        { type: "text", text: "Назовите столицу Мексики.", correct: ["мехико"] },
+        { type: "single", text: "Какие горы расположены на востоке США?", options: ["Аппалачи", "Кордильеры", "Анды"], correct: "Аппалачи" },
+        { type: "single", text: "Какой океан омывает восточное побережье Северной Америки?", options: ["Атлантический", "Тихий", "Индийский"], correct: "Атлантический" },
+        { type: "text", text: "Назовите столицу Кубы.", correct: ["гавана"] }
+      ],
+      "Южная Америка": [
+        { type: "single", text: "Какой язык является официальным в Бразилии?", options: ["Португальский", "Испанский", "Французский"], correct: "Португальский" },
+        { type: "text", text: "Назовите столицу Аргентины.", correct: ["буэнос-айрес", "буэнос айрес"] },
+        { type: "single", text: "Какое озеро находится на границе Перу и Боливии?", options: ["Титикака", "Виктория", "Онтарио"], correct: "Титикака" },
+        { type: "single", text: "Какая страна Южной Америки имеет наибольшую протяжённость с севера на юг?", options: ["Чили", "Перу", "Эквадор"], correct: "Чили" },
+        { type: "text", text: "Как называется крупная река в Венесуэле, впадающая в Атлантику?", correct: ["ориноко"] },
+        { type: "single", text: "Какая страна не имеет выхода к морю в Южной Америке?", options: ["Боливия", "Колумбия", "Уругвай"], correct: "Боливия" },
+        { type: "text", text: "Назовите столицу Перу.", correct: ["лима"] },
+        { type: "single", text: "Какой водопад находится на границе Бразилии и Аргентины?", options: ["Игуасу", "Виктория", "Ниагарский"], correct: "Игуасу" },
+        { type: "single", text: "Какая страна Южной Америки известна озером Маракайбо?", options: ["Венесуэла", "Парагвай", "Чили"], correct: "Венесуэла" },
+        { type: "text", text: "Назовите столицу Чили.", correct: ["сантьяго"] }
+      ],
+      "Австралия": [
+        { type: "single", text: "Какой город Австралии самый крупный по населению?", options: ["Сидней", "Канберра", "Дарвин"], correct: "Сидней" },
+        { type: "text", text: "Назовите море к северо-востоку от Австралии.", correct: ["коралловое море", "коралловое"] },
+        { type: "single", text: "Как называется крупнейшая пустыня Австралии?", options: ["Большая Виктория", "Сахара", "Гоби"], correct: "Большая Виктория" },
+        { type: "single", text: "Какой штат/регион занимает остров Тасмания?", options: ["Тасмания", "Квинсленд", "Виктория"], correct: "Тасмания" },
+        { type: "text", text: "Как называется океан к востоку от Австралии?", correct: ["тихий", "тихий океан"] },
+        { type: "single", text: "Какой пролив отделяет Австралию от Тасмании?", options: ["Бассов", "Гибралтарский", "Берингов"], correct: "Бассов" },
+        { type: "text", text: "Назовите столицу штата Западная Австралия.", correct: ["перт"] },
+        { type: "single", text: "Какая природная достопримечательность находится в центре Австралии?", options: ["Улуру", "Фудзияма", "Этна"], correct: "Улуру" },
+        { type: "single", text: "Какой климат характерен для севера Австралии?", options: ["Субэкваториальный", "Арктический", "Умеренно-континентальный"], correct: "Субэкваториальный" },
+        { type: "text", text: "Назовите вторую по населению агломерацию Австралии после Сиднея.", correct: ["мельбурн"] }
+      ],
+      "Антарктида": [
+        { type: "single", text: "Какой ледник считается одним из крупнейших в мире в Антарктиде?", options: ["Ледник Ламберта", "Ледник Федченко", "Ледник Алетш"], correct: "Ледник Ламберта" },
+        { type: "text", text: "В каком полушарии полностью находится Антарктида?", correct: ["южном", "южное"] },
+        { type: "single", text: "Какой месяц обычно самый тёплый в Антарктиде?", options: ["Январь", "Июль", "Октябрь"], correct: "Январь" },
+        { type: "single", text: "Какие осадки преобладают в Антарктиде?", options: ["Снег", "Дожди", "Ливни"], correct: "Снег" },
+        { type: "text", text: "Как называется российская станция в Антарктиде, где зафиксирована рекордно низкая температура?", correct: ["восток", "станция восток"] },
+        { type: "single", text: "Как называется крупнейший шельфовый ледник Антарктиды?", options: ["Ледник Росса", "Ледник Перито-Морено", "Ледник Маласпина"], correct: "Ледник Росса" },
+        { type: "text", text: "Назовите южный океанический пояс ветров вокруг Антарктиды.", correct: ["западные ветры", "пояс западных ветров"] },
+        { type: "single", text: "Какая птица не встречается в Антарктиде постоянно?", options: ["Колибри", "Пингвин Адели", "Буревестник"], correct: "Колибри" },
+        { type: "single", text: "Какой материк ближе всего к Антарктиде?", options: ["Южная Америка", "Евразия", "Северная Америка"], correct: "Южная Америка" },
+        { type: "text", text: "Назовите пролив между Южной Америкой и Антарктидой.", correct: ["дрейка", "пролив дрейка"] }
+      ]
+    };
+
+    Object.keys(questionBank).forEach(continent => {
+      questionBank[continent] = questionBank[continent].concat(extraQuestionBank[continent] || []);
+    });
+
+    const continentSelect = document.getElementById("continent-select");
+    const startBtn = document.getElementById("start-btn");
+    const backBtn = document.getElementById("back-btn");
+    const checkBtn = document.getElementById("check-btn");
+    const homeScreen = document.getElementById("home-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const questionList = document.getElementById("question-list");
+    const quizTitle = document.getElementById("quiz-title");
+    const quizStatus = document.getElementById("quiz-status");
+
+    let currentQuestions = [];
+
+    function fillContinents() {
+      continentSelect.innerHTML = "";
+      Object.keys(questionBank).forEach(continent => {
+        const option = document.createElement("option");
+        option.value = continent;
+        option.textContent = continent;
+        continentSelect.appendChild(option);
+      });
+    }
+
+    function getRandomQuestions(continent) {
+      const all = [...questionBank[continent]];
+      for (let i = all.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [all[i], all[j]] = [all[j], all[i]];
+      }
+      return all.slice(0, 10);
+    }
+
+    function renderQuestions(continent) {
+      currentQuestions = getRandomQuestions(continent);
+      questionList.innerHTML = "";
+      quizStatus.textContent = "";
+      quizTitle.textContent = `Материк: ${continent} • Случайные вопросы: ${currentQuestions.length}/20`;
+
+      currentQuestions.forEach((q, index) => {
+        const card = document.createElement("div");
+        card.className = "question";
+        card.dataset.type = q.type;
+        card.dataset.correct = JSON.stringify(q.correct);
+
+        const title = document.createElement("p");
+        title.textContent = `${index + 1}. ${q.text}`;
+        card.appendChild(title);
+
+        if (q.type === "single") {
+          const answers = document.createElement("div");
+          answers.className = "answers";
+
+          q.options.forEach(optionText => {
+            const label = document.createElement("label");
+            label.className = "option";
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = `q-${index}`;
+            radio.value = optionText;
+            label.append(radio, document.createTextNode(optionText));
+            answers.appendChild(label);
+          });
+
+          card.appendChild(answers);
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.placeholder = "Введите ответ";
+          input.dataset.role = "text";
+          card.appendChild(input);
+        }
+
+        const correctText = document.createElement("p");
+        correctText.className = "correct-answer hidden";
+        card.appendChild(correctText);
+
+        questionList.appendChild(card);
+      });
+    }
+
+    function normalize(value) {
+      return value.trim().toLowerCase().replace(/ё/g, "е");
+    }
+
+    startBtn.addEventListener("click", () => {
+      const continent = continentSelect.value;
+      renderQuestions(continent);
+      homeScreen.classList.add("hidden");
+      quizScreen.classList.remove("hidden");
+    });
+
+    backBtn.addEventListener("click", () => {
+      quizScreen.classList.add("hidden");
+      homeScreen.classList.remove("hidden");
+      quizStatus.textContent = "";
+    });
+
+    checkBtn.addEventListener("click", () => {
+      const cards = questionList.querySelectorAll(".question");
+      let correctCount = 0;
+
+      cards.forEach(card => {
+        const type = card.dataset.type;
+        const correct = JSON.parse(card.dataset.correct);
+        let isCorrect = false;
+
+        if (type === "single") {
+          const picked = card.querySelector("input[type='radio']:checked");
+          isCorrect = Boolean(picked && picked.value === correct);
+        } else {
+          const userValue = normalize(card.querySelector("input[data-role='text']").value);
+          const valid = Array.isArray(correct) ? correct.map(normalize) : [normalize(correct)];
+          isCorrect = valid.includes(userValue);
+        }
+
+        const rightAnswers = Array.isArray(correct) ? correct : [correct];
+        const answerText = card.querySelector(".correct-answer");
+        answerText.textContent = `Правильный ответ: ${rightAnswers.join(" / ")}`;
+        answerText.classList.remove("hidden");
+
+        card.style.borderColor = isCorrect ? "#2e9d69" : "#d35454";
+        if (isCorrect) correctCount += 1;
+      });
+
+      quizStatus.className = `status ${correctCount === cards.length ? "ok" : "bad"}`;
+      quizStatus.textContent = `Результат: ${correctCount}/${cards.length}`;
+    });
+
+    fillContinents();
+  </script>
 </body>
 </html>
