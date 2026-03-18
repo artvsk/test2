@@ -87,6 +87,11 @@
 
     input[type="text"]::placeholder { color: #8ea4ca; }
 
+    select option {
+      color: #0f172a;
+      background: #eef6ff;
+    }
+
     .home {
       display: grid;
       gap: 12px;
@@ -178,7 +183,15 @@
     <section id="home-screen" class="card">
       <div class="home">
         <label for="continent-select">Какой материк выбираем сегодня?</label>
-        <select id="continent-select"></select>
+        <select id="continent-select">
+          <option value="Европа">Европа</option>
+          <option value="Азия">Азия</option>
+          <option value="Африка">Африка</option>
+          <option value="Северная Америка">Северная Америка</option>
+          <option value="Южная Америка">Южная Америка</option>
+          <option value="Австралия">Австралия</option>
+          <option value="Антарктида">Антарктида</option>
+        </select>
         <button id="start-btn">Поехали! Начать тест</button>
       </div>
     </section>
@@ -211,19 +224,15 @@
     let currentQuestions = [];
 
     function fillContinents() {
-      continentSelect.innerHTML = "";
       const continents = Object.keys(questionBank);
 
       if (!continents.length) {
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = "Вопросы не загрузились";
-        continentSelect.appendChild(option);
         startBtn.disabled = true;
         startBtn.textContent = "Ошибка загрузки";
         return;
       }
 
+      continentSelect.innerHTML = "";
       startBtn.disabled = false;
       continents.forEach(continent => {
         const option = document.createElement("option");
